@@ -1,0 +1,8 @@
+# ---------------------------------------------------------------------------------
+ASSETS = {symbol('TQQQ'): 0.40, symbol('TMF'): 0.25, symbol('EDZ'): 0.15,symbol('IEF'): 0.1}; LEV = 1.0;
+# ---------------------------------------------------------------------------------
+def initialize(context):
+    schedule_function(trade, date_rules.month_start(), time_rules.market_open(minutes = 65))
+
+def trade(context, data):
+    for sec, weight in ASSETS.items(): order_target_percent(sec, weight*LEV)
