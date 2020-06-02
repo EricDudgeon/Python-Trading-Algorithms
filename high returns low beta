@@ -1,0 +1,14 @@
+def initialize(context):
+    schedule_function(trade, date_rules.week_start(days_offset=0), time_rules.market_open(minutes = 33))
+    context.symbols = {symbol("TQQQ"):0.50, symbol("TMF"):0.25, symbol("EDZ"):0.25}
+    
+def trade(context, data):  
+    wt = {}
+    for tick, weigh in context.symbols.items():
+        prices = data.history(tick,'open', 21,'1d')
+        pricesl = data.history(tick,'open', 252,'1d') 
+        wt[tick] = (weigh*(pricesl.max()/prices[-1])/(prices.pct_change()[-14:-1].std()**2) if tick == symbol("TQQQ") else weigh/(prices.pct_change()[-14:-1].std()**2))
+    total_wt = sum([wt[x] for x in wt])
+    
+    for tick, weigh in wt.items():
+        order_target_percent(tick, weigh/total_wt)
